@@ -1,0 +1,60 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "compile cxx",
+            "command": "/share/devhost/tegggi/aws_dev/tc12.4/tc_root/sample/compile",
+            "args": [
+                "${fileDirname}/${fileBasenameNoExtension}.cxx",
+                "${fileDirname}/${fileBasenameNoExtension}.hxx"
+            ],
+            "options": {
+                "cwd": "${fileDirname}",
+                "env": {
+                    "TC_ROOT": "/share/devhost/tegggi/aws_dev/tc12.4/tc_root",
+                    "TC_INCLUDE": "/share/devhost/tegggi/aws_dev/tc12.4/tc_root/include",
+                    "TC_INCLUDE_CPP":"/share/devhost/tegggi/aws_dev/tc12.4/tc_root/include_cpp",
+                    "TC_LIBRARY": "/share/devhost/tegggi/aws_dev/tc12.4/tc_root/lib",
+                    "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:/share/devhost/tegggi/aws_dev/tc12.4/tc_root/lib"
+                }
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Task to Generate o File."
+        },
+        {
+            "type": "cppbuild",
+            "label": "link_custom_exits",
+            "command": "/share/devhost/tegggi/aws_dev/tc12.4/tc_root/sample/link_custom_exits",
+            "args": [
+                "${fileDirname}",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "${fileDirname}",
+                "env": {
+                    "TC_ROOT": "/share/devhost/tegggi/aws_dev/tc12.4/tc_root",
+                    "TC_INCLUDE": "/share/devhost/tegggi/aws_dev/tc12.4/tc_root/include",
+                    "TC_INCLUDE_CPP":"/share/devhost/tegggi/aws_dev/tc12.4/tc_root/include_cpp",
+                    "TC_LIBRARY": "/share/devhost/tegggi/aws_dev/tc12.4/tc_root/lib",
+                    "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:/share/devhost/tegggi/aws_dev/tc12.4/tc_root/lib",
+                    "TC_USER_LIB": "/share/devhost/tegggi/aws_dev/tc12.4/tc_root/sample/${fileBasenameNoExtension}"
+                }
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Task to Link ITK File."
+        },
+    ],
+    "version": "2.0.0"
+}
