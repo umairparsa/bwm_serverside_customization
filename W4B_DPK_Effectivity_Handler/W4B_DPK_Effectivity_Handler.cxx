@@ -42,11 +42,23 @@ int W4B_AssignEffectivityWithEndItem(EPM_action_message_t message){
 	tag_t end_item = ref_attachments[0];
 	tag_t effectivity_object;
 
-	ifail =  WSOM_effectivity_create(releaseStatus[0], end_item, &effectivity_object);
-	AOM_save(releaseStatus[0]);
+	//get status
+	char* status = NULL;
+	
+	ifail = getStatus(message.arguments, &status);
+	tag_t* actualReleaseStatus = NULLTAG;
+	char* objectName = NULL;
+	if(status!=NULL){
+		std::string status_val(status);
+		ifail = getActualStatusObject(status_val.c_str(), releaseStatus, n_statuses , &actualReleaseStatus);
+	}
 
-	ifail = WSOM_eff_set_dates(releaseStatus[0], effectivity_object, n_dates, start_end_values, EFFECTIVITY_open_ended, false);
-	AOM_save(releaseStatus[0]);
+	
+	ifail =  WSOM_effectivity_create(*actualReleaseStatus, end_item, &effectivity_object);
+	AOM_save(*actualReleaseStatus);
+
+	ifail = WSOM_eff_set_dates(*actualReleaseStatus, effectivity_object, n_dates, start_end_values, EFFECTIVITY_open_ended, false);
+	AOM_save(*actualReleaseStatus);
 	char* msg = NULL;
 	EMH_ask_error_text(ifail,& msg);
 	TC_write_syslog("\nifail = %s", msg);
@@ -54,8 +66,48 @@ int W4B_AssignEffectivityWithEndItem(EPM_action_message_t message){
 	return ifail;
 }
 
+/**
+ * Iterates over multiple-status to 
+ * get descired status type object
+ * 
+*/
+int getActualStatusObject(std::string input, tag_t* releaseStatuses, int n_statuses ,tag_t** actualReleaseStatus){
+	int ifail = ITK_ok;
+	char* objectName = NULL;
+	for(int i=0;i<n_statuses;i++){
+		ifail = AOM_ask_value_string(releaseStatuses[i], "object_name", &objectName);
+		if(tc_strcmp(objectName, input.c_str()) == 0){
+			*actualReleaseStatus=&releaseStatuses[i];
+			break;
+		}
+				
+	}
+	return ifail;
+}
 
+/**
+ * Method used to get status 
+ * parameter value from Workflow
+ * 
+*/
+int getStatus(TC_argument_list_t *args, char** status){
+	int ifail = ITK_ok;
+	if(TC_number_of_arguments(args)>0){	
+		char *arg_next = NULL, *arg_value = NULL, *arg_name = NULL;
+		/*get first argument */
+		arg_next = TC_next_argument(args);
+		ifail = ITK_ask_argument_named_value((const char*)arg_next, &arg_name, &arg_value);
+		if(tc_strcmp(arg_name, "status") == 0){
+			*status = arg_value;
+		}
 
+	}
+	return ifail;
+}
+
+/**
+ * get current dates
+*/
 int getcurrentdate(date_t* date,int days){
 	time_t rawtime;
 
